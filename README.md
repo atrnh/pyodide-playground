@@ -1,8 +1,18 @@
-# React + Vite
+# Pyodide Playground
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A runnable Python playground for the browser, inspired by [mdBook's
+editor](https://rust-lang.github.io/mdBook/format/theme/editor.html).
+Powered by [Pyodide](https://pyodide.org/en/stable/index.html).
 
-Currently, two official plugins are available:
+## Roadmap
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- [x] Basic editor
+- [x] Configure initial code
+- [x] Reset code back to initial state
+- [x] Run and show Python output
+- [x] Copy code to clipboard
+- [ ] "Show answer" button (for challenges/exercises)
+- [ ] Make web worker more robust
+- [ ] Styling and visual design
+- [ ] Dark/light mode
+- [ ] Better syntax highlighting
