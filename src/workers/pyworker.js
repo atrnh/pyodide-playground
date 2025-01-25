@@ -30,7 +30,6 @@ self.addEventListener("message", async ({ data }) => {
   try {
     const result = await self.pyodide.runPythonAsync(data);
     console.log("Pyodide result", result);
-    // self.postMessage({ result });
     self.synthConsole.flush();
   } catch (error) {
     self.postMessage({ error: error.message });

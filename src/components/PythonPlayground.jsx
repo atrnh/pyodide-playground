@@ -1,9 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useRef, useState, useEffect, useMemo } from "react";
-import { EditorView, basicSetup } from "codemirror";
-import { keymap } from "@codemirror/view";
-import { indentWithTab } from "@codemirror/commands";
 import PyodideWorker from "../workers/pyworker.js?worker";
+import { createEditor } from "../editor";
 
 const PlaygroundControls = ({ onRun, onReset, onCopy }) => {
   return (
@@ -22,11 +20,9 @@ export const PythonPlayground = ({ initialCode }) => {
   const pyodide = useMemo(() => new PyodideWorker(), []);
 
   useEffect(() => {
-    // if (editorViewRef.current === null && containerRef !== null) {
     if (!editorViewRef.current && containerRef.current) {
-      editorViewRef.current = new EditorView({
+      editorViewRef.current = createEditor({
         doc: initialCode,
-        extensions: [basicSetup, keymap.of([indentWithTab])],
         parent: containerRef.current,
       });
     }
