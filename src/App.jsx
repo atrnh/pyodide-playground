@@ -10,7 +10,7 @@ print(a + b)
 function App() {
   return (
     <>
-      <h1>Python Playground Demo</h1>
+      <h1>Pyodide Playground Demo</h1>
       <p>
         Press the
         {" "}
