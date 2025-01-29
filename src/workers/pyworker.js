@@ -1,4 +1,4 @@
-import { loadPyodide } from "pyodide";
+import { loadPyodide } from "https://cdn.jsdelivr.net/pyodide/v0.27.2/full/pyodide.mjs";
 
 class SynthConsole {
   constructor(worker) {
@@ -6,10 +6,12 @@ class SynthConsole {
     this.decoder = new TextDecoder();
     this.worker = worker;
   }
+
   write(buffer) {
     this.buffer.push(this.decoder.decode(buffer));
     return buffer.length;
   }
+
   flush() {
     this.worker.postMessage({ stdout: this.buffer.join("") });
     this.buffer = [];
@@ -31,7 +33,8 @@ self.addEventListener("message", async ({ data }) => {
     const result = await self.pyodide.runPythonAsync(data);
     console.log("Pyodide result", result);
     self.synthConsole.flush();
-  } catch (error) {
+  }
+  catch (error) {
     self.postMessage({ error: error.message });
   }
 });

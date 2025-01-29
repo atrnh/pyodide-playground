@@ -1,7 +1,9 @@
 /* eslint-disable react/prop-types */
 import { useRef, useState, useEffect, useMemo } from "react";
+import * as Comlink from "comlink";
 import PyodideWorker from "../workers/pyworker.js?worker";
 import { createEditor } from "../editor";
+import { usePyodide } from "../py/context";
 
 const PlaygroundControls = ({ onRun, onReset, onCopy }) => {
   return (
@@ -13,11 +15,8 @@ const PlaygroundControls = ({ onRun, onReset, onCopy }) => {
   );
 };
 
-export const PythonPlayground = ({ initialCode }) => {
+export const CodemirrorContainer = ({ initialCode, editorViewRef }) => {
   const containerRef = useRef(null);
-  const editorViewRef = useRef(null);
-  const [runResult, setRunResult] = useState([]);
-  const pyodide = useMemo(() => new PyodideWorker(), []);
 
   useEffect(() => {
     if (!editorViewRef.current && containerRef.current) {
@@ -27,6 +26,62 @@ export const PythonPlayground = ({ initialCode }) => {
       });
     }
   }, [containerRef, editorViewRef, initialCode]);
+
+  return (
+    <div className="codemirror-wrapper" ref={containerRef}></div>
+  );
+};
+
+export const PythonPlayground2 = ({ initialCode }) => {
+  const editorViewRef = useRef(null);
+  const pyodide = usePyodide();
+  const [runResult, setRunResult] = useState([]);
+  return (
+    <div className="playground">
+      <PlaygroundControls
+        onRun={async () => {
+          const input = editorViewRef?.current?.state?.doc?.toString();
+          const result = await pyodide.runPythonAsync(
+            input,
+            Comlink.proxy((error, result) => {
+              if (error) {
+                console.error(error);
+                return;
+              }
+              console.log("result", result);
+              setRunResult([result]);
+            }),
+          );
+          setRunResult([result]);
+        }}
+        onReset={() => {
+          editorViewRef?.current.dispatch({
+            changes: {
+              from: 0,
+              to: editorViewRef?.current.state.doc.toString().length,
+              insert: initialCode,
+            },
+          });
+          setRunResult([]);
+        }}
+      />
+      <CodemirrorContainer
+        initialCode={initialCode}
+        editorViewRef={editorViewRef}
+      />
+      <div className="output">
+        <pre>
+          <code>{runResult.join("\n")}</code>
+        </pre>
+      </div>
+    </div>
+  );
+};
+
+export const PythonPlayground = ({ initialCode }) => {
+  const editorViewRef = useRef(null);
+  const [runResult, setRunResult] = useState([]);
+  const pyodide = useMemo(() => new PyodideWorker(), []);
 
   const handleOutput = ({ data }) => {
     console.log("received from worker", data);
@@ -65,7 +120,10 @@ export const PythonPlayground = ({ initialCode }) => {
   return (
     <div className="playground">
       <PlaygroundControls onReset={handleResetCode} onRun={handleRunCode} />
-      <div className="codemirror-wrapper" ref={containerRef}></div>
+      <CodemirrorContainer
+        initialCode={initialCode}
+        editorViewRef={editorViewRef}
+      />
       <div className="output">
         <pre>
           <code>{runResult.join("\n")}</code>
